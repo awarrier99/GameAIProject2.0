@@ -1,5 +1,6 @@
 import pygame
 import settings
+from Lander import Lander
 
 from os.path import join
 
@@ -11,6 +12,8 @@ class Game:
         self.background = None
         self.clock = pygame.time.Clock()
         self.visual_sensors = []
+        self.lander = Lander((300, 200), 0, 0)
+        self.all_sprites = None
 
     def run(self):
         self.setup()
@@ -23,11 +26,11 @@ class Game:
         # self.visual_sensors.append([VisualSensors(self.player, *settings.size)])
         pygame.display.set_caption('James and Ashvin\'s Game \'AI\'')
 
-        background = pygame.image.load(join('images', 'background.jpg'))
-        background = pygame.transform.scale(background, settings.size)
-        self.background = background.convert()
-
-        self.screen.blit(self.background, (0, 0))
+        # background = pygame.image.load(join('images', 'background.jpg'))
+        # background = pygame.transform.scale(background, settings.size)
+        # self.background = background.convert()
+        self.all_sprites = pygame.sprite.Group(self.lander)
+        # self.screen.blit(self.background, (0, 0))
 
     def mainloop(self):
         while self.__running:
@@ -37,11 +40,12 @@ class Game:
             pygame.display.set_caption(caption)
 
             self.handle_events()
-
+            self.lander.update()
             if settings.visuals:
                 for vs in self.visual_sensors:
                     vs.update()
             # self.world.update()
+            self.all_sprites.update()
             self.redraw()
 
     def handle_events(self):
@@ -53,7 +57,11 @@ class Game:
                     self.__running = False
 
     def redraw(self):
-        self.screen.blit(self.background, (0, 0))
+        # self.screen.blit(self.background, (0, 0))
+        pygame.display.update(self.lander)
+        self.all_sprites.draw(self.screen)
+        self.lander.draw(self.screen)
+
         pygame.display.flip()
 
 

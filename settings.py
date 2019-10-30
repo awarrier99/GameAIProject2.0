@@ -1,4 +1,4 @@
-width, height = 1085, 735
+width, height = 1680, 1050
 # width, height = 0, 0
 size = width, height
 FPS = 60

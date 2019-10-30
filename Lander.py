@@ -4,10 +4,11 @@ import game
 from pygame.math import Vector2
 
 
-class Lander(pygame.sprite.Sprite):
+class Lander(pygame.sprite.DirtySprite):
 
     def __init__(self, position, velocity, angle):
         super().__init__()
+        self.dirty = 1
         self.position = position
         self.i_velocity = velocity
         self.velocity = velocity
@@ -46,6 +47,7 @@ class Lander(pygame.sprite.Sprite):
 
         self.compute_position()
         self.rect.center = self.position
+        self.dirty = 1
 
     def compute_position(self):
         if not game.world.terrain.colliderect(self.rect):

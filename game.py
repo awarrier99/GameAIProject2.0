@@ -27,7 +27,6 @@ def run():
 def setup():
     global screen, background, clock, world
 
-    pygame.init()
     screen = pygame.display.set_mode(settings.size)
     pygame.display.set_caption('Lunar Landing AI')
 
@@ -39,6 +38,7 @@ def setup():
     seed()
     get_star_positions()
     star_background()
+    draw_background()
 
 
 def get_star_positions():
@@ -46,7 +46,7 @@ def get_star_positions():
 
     x_bound = settings.width - 1
     y_bound = world.terrain.top - 1
-    for i in range(25):
+    for i in range(50):
         x = randint(0, x_bound)
         y = randint(0, y_bound)
         stars.append((x, y))
@@ -105,9 +105,9 @@ def handle_keys():
 def draw():
     global world, screen
 
-    draw_background()
-    world.draw()
-    pygame.display.flip()
+    # draw_background()
+    dirty = world.draw()
+    pygame.display.update(dirty)
 
 
 def cleanup():

@@ -13,7 +13,7 @@ class World:
         self.terrain = Terrain()
         self.gravity = Vector2(0, 0.001)
         self.lander = Lander(Vector2(300, 100), Vector2(0, 0), 0)
-        self.all_sprites = pygame.sprite.Group(self.lander)
+        self.all_sprites = pygame.sprite.LayeredDirty(self.lander)
         self.visual_sensors = []
 
     def update(self):
@@ -23,8 +23,6 @@ class World:
                 vs.update()
 
     def draw(self):
-        game.screen.blit(game.background, (0, 0))
-        self.lander.draw(game.screen)
-        self.all_sprites.draw(game.screen)
         pygame.draw.rect(game.screen, (150, 150, 150), self.terrain)
-
+        self.lander.draw(game.screen)
+        return self.all_sprites.draw(game.screen)

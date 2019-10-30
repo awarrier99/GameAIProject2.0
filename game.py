@@ -77,8 +77,7 @@ def handle_events():
 
 
 def draw():
-    global world
-
+    global world, screen
     dirty_sprites, dirty_rects = world.draw()
     pygame.display.update(dirty_sprites + dirty_rects)
 

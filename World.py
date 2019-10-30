@@ -3,15 +3,21 @@ import settings
 import game
 
 from Terrain import Terrain
+from Lander import Lander
 
 
 class World:
     def __init__(self):
         self.terrain = Terrain()
         self.__init_terrain = True
-        self.all_sprites = pygame.sprite.LayeredDirty()
-        self.all_sprites.clear(game.screen, game.background)
+        self.gravity = (0, 1)
+        self.lander = Lander((300, 50), (2, 0), 0)
+        self.all_sprites = pygame.sprite.LayeredDirty(self.lander)
         self.visual_sensors = []
+
+    def set_background(self):
+        self.all_sprites.clear(game.screen, game.background)
+        game.screen.blit(game.background, (0, 0))
 
     def update(self):
         self.all_sprites.update()

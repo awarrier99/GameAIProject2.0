@@ -12,6 +12,7 @@ screen = None
 background = None
 clock = None
 world = None
+stars = []
 
 
 def run():
@@ -36,17 +37,33 @@ def setup():
     background = pygame.Surface(screen.get_size())
     background = background.convert()
     seed()
+    get_star_positions()
     star_background()
-    world.set_background()
 
 
-def star_background():
+def get_star_positions():
+    global stars
+
     x_bound = settings.width - 1
     y_bound = world.terrain.top - 1
     for i in range(25):
         x = randint(0, x_bound)
         y = randint(0, y_bound)
-        pygame.draw.circle(background, (255, 255, 255), (x, y), 0)
+        stars.append((x, y))
+
+
+def star_background():
+    global background, stars
+
+    for star in stars:
+        pygame.draw.circle(background, (255, 255, 255), star, 0)
+
+
+def draw_background():
+    global screen, background
+
+    star_background()
+    screen.blit(background, (0, 0))
 
 
 def mainloop():
@@ -59,6 +76,7 @@ def mainloop():
         pygame.display.set_caption(caption)
 
         handle_events()
+        handle_keys()
         world.update()
         draw()
 
@@ -76,10 +94,20 @@ def handle_events():
                 __running = False
 
 
+def handle_keys():
+    global world
+
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_UP]:
+        world.lander.apply_thrust()
+
+
 def draw():
     global world, screen
-    dirty_sprites, dirty_rects = world.draw()
-    pygame.display.update(dirty_sprites + dirty_rects)
+
+    draw_background()
+    world.draw()
+    pygame.display.flip()
 
 
 def cleanup():

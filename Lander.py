@@ -1,25 +1,24 @@
 import pygame
 import game
-import math
+
 from pygame.math import Vector2
-import random
-
-from util import add
 
 
-class Lander(pygame.sprite.DirtySprite):
+class Lander(pygame.sprite.Sprite):
 
-    def __init__(self, location, velocity, angle):
+    def __init__(self, position, velocity, angle):
         super().__init__()
-        self.location = location
+        self.position = position
+        self.i_velocity = velocity
         self.velocity = velocity
-        self.heading = angle
-        self.accelMagnitude = 0.0
+        self.angle = angle
+        self.thrust = Vector2(0, -0.003)
+        self.thrusting = False
 
         self.image = pygame.image.load('images/small_lander.png')
         # self.image = pygame.transform.scale(self.image, (15, 10))
         self.rect = self.image.get_rect()
-        self.rect.center = self.location
+        self.rect.center = self.position
 
         self.thrust_count = 0
         self.scale = 1.0
@@ -29,11 +28,11 @@ class Lander(pygame.sprite.DirtySprite):
         self.engine_left_anchor_offset = 10
         self.engine_right_anchor_offset = 50
 
-    def thrust(self):
+    def apply_thrust(self):
         self.thrust_count += 1
+        self.thrusting = True
 
     def update(self):
-
         if self.engine_increasing:
             if self.engine_height < len(self.engine_heights) - 1:
                 self.engine_height += 1
@@ -45,30 +44,21 @@ class Lander(pygame.sprite.DirtySprite):
             else:
                 self.engine_increasing = True
 
+        self.compute_position()
+        self.rect.center = self.position
 
-        self.compute_velocity()
-        self.translate_velocity()
-
-        if not self.rect.center == self.location:
-            self.dirty = 1
-            self.rect.center = self.location
-        else:
-            self.dirty = 0
-
-    def compute_velocity(self):
-        pass
-        # if not game.frame_counter % 50:
-            # self.velocity = add(self.velocity, game.world.gravity)
-
-    def translate_velocity(self):
-        if not (game.world.terrain.colliderect(self.rect) or game.frame_counter % 2):
-            self.location = add(self.location, self.velocity)
-            self.normalize_location()
+    def compute_position(self):
+        if not game.world.terrain.colliderect(self.rect):
+            self.position += self.velocity
+            if self.thrusting:
+                self.thrusting = False
+                self.velocity += self.thrust
+            self.velocity += game.world.gravity
 
     def normalize_location(self):
-        if (self.location[1] + (self.rect.height / 2)) > game.world.terrain.top:
-            self.location = (self.location[0], game.world.terrain.top - (self.rect.height / 2) + 1)
+        if (self.position.y + (self.rect.height / 2)) > game.world.terrain.top:
+            self.position = Vector2(self.position.x, game.world.terrain.top - (self.rect.height / 2) + 1)
 
     def draw(self, screen):
-        pygame.draw.aaline(screen, (255,255,255), (self.location[0] - 3, self.location[1]+7), (self.location[0], self.location[1] + self.engine_heights[self.engine_height]), 1)
-        pygame.draw.aaline(screen, (255,255,255), (self.location[0] + 3, self.location[1]+7), (self.location[0], self.location[1] + self.engine_heights[self.engine_height]), 1)
+        pygame.draw.aaline(screen, (255,255,255), (self.position[0] - 3, self.position[1]+7), (self.position[0], self.position[1] + self.engine_heights[self.engine_height]), 1)
+        pygame.draw.aaline(screen, (255,255,255), (self.position[0] + 3, self.position[1]+7), (self.position[0], self.position[1] + self.engine_heights[self.engine_height]), 1)

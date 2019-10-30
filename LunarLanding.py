@@ -2,8 +2,8 @@
 Authors: Ashvin Warrier and James Lowe
 """
 import settings
+import game
 
-from Game import Game
 from argparse import ArgumentParser
 
 
@@ -15,5 +15,4 @@ if __name__ == "__main__":
     parser.add_argument('-f', '--fps', type=int, help='frames per second')
     config = vars(parser.parse_args())
     settings.init(config)
-    game = Game()
     game.run()

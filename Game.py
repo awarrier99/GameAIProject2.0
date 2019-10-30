@@ -1,8 +1,8 @@
 import pygame
 import settings
 
-from os.path import join
 from World import World
+from random import seed, randint
 
 
 __running = False
@@ -26,16 +26,26 @@ def setup():
 
     pygame.init()
     screen = pygame.display.set_mode(settings.size)
-    pygame.display.set_caption('James and Ashvin\'s Game \'AI\'')
-
-    background = pygame.image.load(join('images', 'background.jpg'))
-    background = pygame.transform.scale(background, settings.size)
-    background = background.convert()
-
-    screen.blit(background, (0, 0))
+    pygame.display.set_caption('James and Ashvin\'s Game AI')
 
     clock = pygame.time.Clock()
     world = World()
+
+    background = pygame.Surface(screen.get_size())
+    background = background.convert()
+    seed()
+    star_background()
+
+    screen.blit(background, (0, 0))
+
+
+def star_background():
+    x_bound = settings.width - 1
+    y_bound = world.terrain.top - 1
+    for i in range(25):
+        x = randint(0, x_bound)
+        y = randint(0, y_bound)
+        pygame.draw.circle(background, (255, 255, 255), (x, y), 0)
 
 
 def mainloop():
@@ -44,7 +54,7 @@ def mainloop():
     while __running:
         clock.tick(settings.FPS)
 
-        caption = 'Lunar Landing \'AI\'  FPS: {}'.format(round(clock.get_fps(), 1))
+        caption = 'Lunar Landing AI | FPS: {}'.format(round(clock.get_fps(), 1))
         pygame.display.set_caption(caption)
 
         handle_events()

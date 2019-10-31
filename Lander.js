@@ -51,11 +51,9 @@ Lander = function() {
 		}
 		this.thrusting = 0;
 
-	};
-
+	}
+	
 	reset();
-
-
 
 	this.rotate = function(direction) {
 		var now = new Date().getTime();
@@ -68,6 +66,7 @@ Lander = function() {
 		}
 
 	};
+
 	this.setRotation = function(angle) {
 
 		targetRotation = Math.round(clamp(angle, -90, 90)/10)*10;
@@ -78,9 +77,8 @@ Lander = function() {
 	this.thrust = function (power) {
 		this.thrusting = power;
 
-		//this.thrustBuild = power;
-
 	};
+
 	this.abort = function() {
 		var now = Date.now();
 
@@ -181,6 +179,7 @@ Lander = function() {
 		this.colour = 'white';
 
 	};
+
 	this.crash = function () {
 		this.rotation = targetRotation = 0;
 		this.active = false;
@@ -188,10 +187,12 @@ Lander = function() {
 		thrustBuild = 0;
 
 	};
+
 	this.land = function () {
 		this.active  =false;
 		thrustBuild = 0;
 	};
+
 	this.makeBounce = function() {
 		bouncing = Math.PI*2;
 
@@ -292,8 +293,6 @@ Lander = function() {
 
 			c.save();
 			c.translate(shapePos[i].x, shapePos[i].y);
-			//if(exploding) shapePos[i].plusEq(shapeVels[i]);
-			//console.log(i, shapePos[i], shapeVels[i]);
 
 			while(s.length>0) {
 
@@ -322,13 +321,7 @@ Lander = function() {
 
 			}
 			c.restore();
-
-
 		}
-
-
-
-
 	};
 
 };

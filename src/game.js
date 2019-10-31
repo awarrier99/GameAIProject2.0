@@ -142,7 +142,9 @@ function loop() {
 		checkKeys();
 		lander_pad_diff.x = lander.pos.x - (275)
 		lander_pad_diff.y = lander.pos.y - (350)
-		console.log(lander_pad_diff)
+		// console.log(lander_pad_diff)
+		// console.log(view.x)
+			console.log(lander.pos)
 	}
 
 	lander.update();
@@ -206,8 +208,7 @@ function checkKeys() {
 function updateView()
 {
 	var zoomamount  = 0,
-	 	// marginx  = SCREEN_WIDTH *0.2,
-		marginx = 0;
+	 	marginx  = SCREEN_WIDTH *0.2,
 		margintop = SCREEN_HEIGHT * 0.2,
 		marginbottom = SCREEN_HEIGHT * 0.3;
 
@@ -218,12 +219,23 @@ function updateView()
 	}
 
 	zoomamount = view.scale;
+	if (zoomedIn) {
+		if(((lander.pos.x * zoomamount) + view.x < marginx)){
+			view.x = -(lander.pos.x * zoomamount) + marginx;
+		} else if (((lander.pos.x * zoomamount) + view.x > SCREEN_WIDTH - marginx)) {
+			view.x = -(lander.pos.x * zoomamount) + SCREEN_WIDTH - marginx;
+		}
 
-
-	if(((lander.pos.x * zoomamount) + view.x < marginx)){
+		if((lander.pos.y * zoomamount) + view.y < margintop) {
+			view.y = -(lander.pos.y * zoomamount) + margintop;
+		} else if ((lander.pos.y * zoomamount) + view.y > SCREEN_HEIGHT - marginbottom) {
+			view.y = -(lander.pos.y * zoomamount) + SCREEN_HEIGHT - marginbottom;
+		}
+	}
+	if (lander.pos.x < 0 && gameState != CRASHED){
 		setCrashed();
 		// view.x = -(lander.pos.x * zoomamount) + marginx;
-	} else if (((lander.pos.x * zoomamount) + view.x > SCREEN_WIDTH - marginx)) {
+	} else if (lander.pos.x > SCREEN_WIDTH && gameState != CRASHED) {
 		// view.x = -(lander.pos.x * zoomamount) + SCREEN_WIDTH - marginx;
 		setCrashed();
 	}

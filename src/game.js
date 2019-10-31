@@ -21,7 +21,9 @@ var SCREEN_WIDTH = window.innerWidth,
 	singlePlayMode = false, // for arcade machine
 	lastMouseMove = Date.now(),
 	lastMouseHide =0,
-	mouseHidden = false;
+	mouseHidden = false,
+	lander_pad_diff = new Vector2(0,0);
+
 
 // game states
 var	WAITING = 0,
@@ -138,6 +140,9 @@ function loop() {
 
 	if(gameState == PLAYING) {
 		checkKeys();
+		lander_pad_diff.x = lander.pos.x - (275)
+		lander_pad_diff.y = lander.pos.y - (350)
+		console.log(lander_pad_diff)
 	}
 
 	lander.update();
@@ -201,7 +206,8 @@ function checkKeys() {
 function updateView()
 {
 	var zoomamount  = 0,
-	 	marginx  = SCREEN_WIDTH *0.2,
+	 	// marginx  = SCREEN_WIDTH *0.2,
+		marginx = 0;
 		margintop = SCREEN_HEIGHT * 0.2,
 		marginbottom = SCREEN_HEIGHT * 0.3;
 
@@ -215,9 +221,11 @@ function updateView()
 
 
 	if(((lander.pos.x * zoomamount) + view.x < marginx)){
-		view.x = -(lander.pos.x * zoomamount) + marginx;
+		setCrashed();
+		// view.x = -(lander.pos.x * zoomamount) + marginx;
 	} else if (((lander.pos.x * zoomamount) + view.x > SCREEN_WIDTH - marginx)) {
-		view.x = -(lander.pos.x * zoomamount) + SCREEN_WIDTH - marginx;
+		// view.x = -(lander.pos.x * zoomamount) + SCREEN_WIDTH - marginx;
+		setCrashed();
 	}
 
 	if((lander.pos.y * zoomamount) + view.y < margintop) {

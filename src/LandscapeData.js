@@ -1,6 +1,5 @@
 
-function Landscape(){
-
+Landscape = function(){
 	var points = this.points = [],
 		lines = this.lines = [],
 		stars = this.stars = [],
@@ -10,7 +9,9 @@ function Landscape(){
 		zoneInfos = [],
 		landscale = 1.5,
 		rightedge,
-		flickerProgress = 0;
+		flickerProgress = 0,
+		offset = 0,
+		offsetY = 0;
 
 	setupData();
 
@@ -44,7 +45,7 @@ function Landscape(){
 
 	var render = this.render = function(c, view) {
 
-		var offset = 0;
+		offset = 0;
 
 		while(view.left-offset>rightedge) {
 			offset+=rightedge;
@@ -69,7 +70,7 @@ function Landscape(){
 		c.beginPath();
 
 		var line = lines[i];
-		var offsetY = 0;
+		offsetY = 0;
 		if(Math.random()<0.3) {
 			offset+=(0.2/view.scale);
 			offsetY = (0.2/view.scale);
@@ -79,9 +80,9 @@ function Landscape(){
 		var zoneInfoIndex = 0;
 
 		while((line = lines[i]).p1.x+offset<view.right) {
-
 			var point = line.p2;
 			c.lineTo(point.x+offset, point.y);
+			c.stroke()
 
 			if((counter%20>10) && (line.multiplier!=1)){
 				var infoBox;
@@ -103,7 +104,7 @@ function Landscape(){
 			i++;
 			if(i>=lines.length) {
 				i=0;
-				offset+=rightedge;
+				offset+= rightedge;
 			}
 
 
@@ -129,6 +130,7 @@ function Landscape(){
 		for(var i=zoneInfoIndex; i<zoneInfos.length; i++) {
 			zoneInfos[i].hide();
 		}
+
 
 		// draw stars :
 		//
@@ -201,6 +203,8 @@ function Landscape(){
 		points.push(new Vector2(300, 350));
 		points.push(new Vector2(450, 340));
 		points.push(new Vector2(1000, 355.55));
+
+		// middle of landing is 275
 
 
 		// availableZones.push(new LandingZone(5, 0));

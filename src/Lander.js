@@ -52,7 +52,7 @@ Lander = function() {
 		this.thrusting = 0;
 
 	}
-	
+
 	reset();
 
 	this.rotate = function(direction) {
@@ -91,6 +91,7 @@ Lander = function() {
 
 	this.update = function() {
 
+		// console.log(this.pos)
 		counter++;
 
 		this.rotation += (	targetRotation-this.rotation)*0.3;

@@ -106,7 +106,6 @@ function init()
 
 }
 
-
 function loop() {
 	requestAnimationFrame(loop);
 
@@ -235,7 +234,6 @@ function updateView()
 
 }
 
-
 function setLanded(line) {
 
 	multiplier = line.multiplier;
@@ -301,7 +299,6 @@ function setCrashed() {
 
 	samples.explosion.play();
 }
-
 
 function setGameOver() {
 
@@ -375,11 +372,9 @@ function checkCollisions() {
 			if(line.landable) {
 				// and the lander's bottom is overlapping the line
 				if(lander.bottom>=line.p1.y) {
-					//console.log('lander overlapping ground');
-					// and the lander is completely within the line
+
 					if((left>line.p1.x) && (right<line.p2.x)) {
-						//console.log('lander within line', lander.rotation, lander.vel.y);
-						// and we're horizontal and moving slowly
+
 						if((lander.rotation==0) && (lander.vel.y<0.15)) {
 							//console.log('horizontal and slow');
 							setLanded(line);

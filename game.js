@@ -4,13 +4,7 @@ var SCREEN_WIDTH = window.innerWidth,
 	SCREEN_HEIGHT = window.innerHeight,
 	HALF_WIDTH = window.innerWidth / 2,
 	HALF_HEIGHT = window.innerHeight / 2,
-	touchable = "ontouchstart" in window,
-	touchController,
-	touchThrustTop = 0.25,
-	touchThrustBottom = 0.9,
-	touchRotateRange = 0.2,
-	touchRotateStartAngle = 0,
-	touchRotate = false,
+
 	rotateDialBrightness= 0,
 	fps = 60,
 	mpf = 1000/fps,
@@ -28,7 +22,6 @@ var SCREEN_WIDTH = window.innerWidth,
 	lastMouseHide =0,
 	mouseHidden = false;
 
-	if(touchable) touchController= new TouchController();
 // game states
 var	WAITING = 0,
 	PLAYING = 1,
@@ -77,14 +70,12 @@ window.addEventListener("load", init);
 
 function init()
 {
-	initWebSocket();
 	// CANVAS SET UP
 
 	document.body.appendChild(canvas);
 
 	stats.domElement.style.position = 'absolute';
 	stats.domElement.style.top = (SCREEN_HEIGHT-45)+'px';
-	//document.body.appendChild( stats.domElement );
 
 	infoDisplay = new InfoDisplay(SCREEN_WIDTH, SCREEN_HEIGHT);
 	document.body.appendChild(infoDisplay.domElement);
@@ -95,11 +86,9 @@ function init()
 
 	document.body.addEventListener('mousedown', onMouseDown);
 	document.body.addEventListener('mousemove', onMouseMove);
-	document.body.addEventListener('touchstart', onTouchStart);
 
 	KeyTracker.addKeyDownListener(KeyTracker.UP, function() { if(gameState==PLAYING) lander.thrust(1);});
 	KeyTracker.addKeyUpListener(KeyTracker.UP, function() { lander.thrust(0);});
-
 
 
 	window.addEventListener('resize', resizeGame);
@@ -111,70 +100,6 @@ function init()
 	loop();
 
 }
-
-
-function sendPosition() {
-
-	if(gameState==PLAYING) {
-		var update = {
-			type : 'update',
-			id : wsID,
-			x : Math.round(lander.pos.x*100),
-			y : Math.round(lander.pos.y*100),
-			a : Math.round(lander.rotation),
-			t : lander.thrusting
-		};
-
-		sendObject(update);
-
-	}
-}
-
-function sendLanded() {
-
-	var update = {
-		type : 'land',
-		x : Math.round(lander.pos.x*100),
-		y : Math.round(lander.pos.y*100),
-		id : wsID
-	};
-	sendObject(update);
-}
-
-function sendCrashed() {
-
-	var update = {
-		type : 'crash',
-		x : Math.round(lander.pos.x*100),
-		y : Math.round(lander.pos.y*100),
-		id : wsID
-	};
-	sendObject(update);
-}
-function sendGameOver() {
-
-	var update = {
-		type : 'over',
-		x : Math.round(lander.pos.x*100),
-		y : Math.round(lander.pos.y*100),
-		id : wsID,
-		sc : score
-	};
-	sendObject(update);
-}
-function sendRestart() {
-	var update = {
-		type : 'restart',
-		id : wsID,
-		sc : score
-	};
-	sendObject(update);
-	sendLocation();
-}
-
-
-
-//
 
 
 function loop() {
@@ -190,19 +115,12 @@ function loop() {
 	var renderedTime = counter*mpf;
 
 	if(elapsedFrames<counter) {
-			// c.fillStyle = 'green';
-			// 		c.fillRect(0,0,10,10);
 		counter--;
 		return;
 	}
 
 	while(elapsedFrames > counter) {
 		lander.update();
-		if((counter%6)==0){
-			sendPosition();
-
-		}
-
 
 		counter++;
 
@@ -212,54 +130,13 @@ function loop() {
 			counter = elapsedFrames;
 		}
 
-
-
 	}
 
-	//stats.update();
-
-
 	if(gameState == PLAYING) {
-
-
 		checkKeys();
-		if(touchable) {
-			if(touchController.rightTouch.touching) {
-				//console.log(touchController.rightTouch.getY());
-				//console.log(map(touchController.rightTouch.getY(), SCREEN_HEIGHT*touchThrustBottom, SCREEN_HEIGHT*touchThrustTop));
-				lander.thrust(map(touchController.rightTouch.getY(), SCREEN_HEIGHT*touchThrustBottom, SCREEN_HEIGHT*touchThrustTop, 0,1,true));
-			} else {
-				lander.thrust(0);
-			}
-
-			if(touchController.leftTouch.touching) {
-
-				if(!touchRotate) {
-					touchRotate = true;
-					touchRotateStartAngle = lander.rotation;
-				}
-//				console.log(map(touchController.leftTouch.getX(), SCREEN_WIDTH*touchRotateLeft, SCREEN_WIDTH*touchRotateRight, -90,90,true));
-				var touchAngle = map(touchController.leftTouch.getXOffset(), SCREEN_WIDTH*touchRotateRange*-0.5, SCREEN_WIDTH*touchRotateRange*0.5, -90,90);
-				touchAngle +=touchRotateStartAngle;
-
-
-				lander.setRotation(touchAngle);
-
-			} else {
-				touchRotate = false;
-			}
-
-
-
-
-		}
 	}
 
 	lander.update();
-	if((counter%6)==0){
-		sendPosition();
-
-	}
 
 	if((gameState == WAITING) && (lander.altitude<100) ) {
 		gameState=GAMEOVER;
@@ -282,149 +159,20 @@ function render() {
 
 	var c = context;
 
-	//c.fillStyle="rgba(0,0,0, 0.4)";
-	//c.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 	c.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-
-	//c.fillRect(lander.left, lander.top, lander.right-lander.left, lander.bottom-lander.top);
-	// if(skippedFrames>0) {
-	// 		c.fillStyle = 'green';
-	// 		c.fillRect(0,0,10*skippedFrames,10);
-	// 	}
 
 	c.save();
 	c.translate(view.x, view.y);
 	c.scale(view.scale, view.scale);
 
-	// THIS CODE SHOWS THE VIEWPORT
-	// c.beginPath();
-	// 	c.moveTo(view.left+2, view.top+2);
-	// 	c.lineTo(view.right-2, view.bottom-2);
-	// 	c.strokeStyle = 'blue';
-	// 	c.lineWidth = 2;
-	// 	c.rect(view.left, view.top, view.right-view.left, view.bottom-view.top);
-	// 	c.stroke();
-	//
-
 
 	landscape.render(context, view);
 	lander.render(context, view.scale);
 
-	// for(var i =0; i<testPoints.length; i++) {
-	// 		c.fillRect(testPoints[i].x, testPoints[i].y, 1,1);
-	// 	}
 
 	if(counter%4==0) updateTextInfo();
 
 	c.restore();
-	// c.strokeStyle = 'white';
-	// 	c.beginPath();
-	// 	c.moveTo(0,mouseTop+HALF_HEIGHT);
-	// 	c.lineTo(50,mouseTop+HALF_HEIGHT);
-	// 	c.moveTo(0,mouseBottom+HALF_HEIGHT);
-	// 	c.lineTo(50,mouseBottom+HALF_HEIGHT);
-	// 	c.stroke();
-
-
-	if(touchable && (gameState== PLAYING)) {
-		//touchController.render(context);
-
-		if(touchController.active) {
-
-			context.strokeStyle = 'white';
-			context.lineWidth = 1;
-
-
-			// draws the thrust controls
-			var rightX = SCREEN_WIDTH*0.9;
-			if(touchController.rightTouch.getX()!=0) {
-				context.beginPath();
-				context.moveTo(SCREEN_HEIGHT*touchThrustBottom, rightX);
-				context.lineTo(SCREEN_HEIGHT*touchThrustTop, rightX);
-				for(var i = 0; i<=20;i++) {
-					context.moveTo(rightX-5, map(i, 0, 20, SCREEN_HEIGHT*touchThrustBottom, SCREEN_HEIGHT*touchThrustTop));
-					context.lineTo(rightX+5, map(i, 0, 20, SCREEN_HEIGHT*touchThrustBottom, SCREEN_HEIGHT*touchThrustTop));
-				}
-
-			//	if(touchController.rightTouch.touching) {
-
-				var indicatorY = map(lander.thrustLevel, 1,0, SCREEN_HEIGHT*touchThrustTop,SCREEN_HEIGHT*touchThrustBottom);
-				context.moveTo(rightX-SCREEN_WIDTH*0.1, indicatorY);
-				context.lineTo(rightX-5, indicatorY);
-				context.moveTo(rightX-5, indicatorY-5);
-				context.lineTo(rightX-5, indicatorY+5);
-
-
-				context.stroke();
-
-
-				//context.strokeRect(rightX-SCREEN_WIDTH*0.04, map(0.5, 0,1, SCREEN_HEIGHT*touchThrustTop,SCREEN_HEIGHT*touchThrustBottom), SCREEN_WIDTH*0.08,SCREEN_HEIGHT*0.05);
-				context.beginPath();
-				context.arc(rightX-SCREEN_WIDTH*0.12, indicatorY, SCREEN_WIDTH*0.01, 0, Math.PI*2, true);
-				context.stroke();
-			//	}
-
-
-			}
-
-			//draws rotation controls
-			if(touchController.leftTouch.getX()!=0) {
-
-				if(touchController.leftTouch.touching) rotateDialBrightness = 100;
-				else rotateDialBrightness *=0.95;
-				context.beginPath();
-				context.strokeStyle = "hsl(0,0%,"+rotateDialBrightness+"%)";
-
-				for(var i= -180; i<=0; i+=10) {
-
-					context.save();
-					context.translate(touchController.leftTouch.getX(), touchController.leftTouch.getY());
-					context.rotate(i*Math.PI/180);
-					context.moveTo(55,0);
-					context.lineTo(60,0);
-					context.restore();
-
-				}
-
-				context.save();
-				context.translate(touchController.leftTouch.getX(), touchController.leftTouch.getY());
-
-
-				context.moveTo(80,-10);
-				context.lineTo(90,0);
-				context.lineTo(80,10);
-				context.closePath();
-
-				context.moveTo(-80,-10);
-				context.lineTo(-90,0);
-				context.lineTo(-80,10);
-				context.closePath();
-
-				context.rotate((lander.rotation-90)*Math.PI/180);
-
-				context.moveTo(70,-7);
-				context.lineTo(77,0);
-				context.lineTo(70,7);
-				context.closePath();
-
-
-
-
-				context.restore();
-
-
-				context.stroke();
-
-
-
-
-			}
-
-
-
-
-		}
-	}
 }
 
 function checkKeys() {
@@ -480,39 +228,31 @@ function updateView()
 	view.right = view.left + (SCREEN_WIDTH/view.scale);
 	view.bottom = view.top + (SCREEN_HEIGHT/view.scale);
 
-
 }
-
 
 
 function setLanded(line) {
 
 	multiplier = line.multiplier;
-
 	lander.land();
 
 	var points = 0;
 	if(lander.vel.y<0.075) {
 		points = 50 * multiplier;
-		// show message - "a perfect landing";
 		infoDisplay.showGameInfo("CONGRATULATIONS<br>A PERFECT LANDING\n" + points + " POINTS");
 		lander.fuel+=50;
 	} else {
 		points = 15 * multiplier;
-		// YOU LANDED HARD
 		infoDisplay.showGameInfo("YOU LANDED HARD<br>YOU ARE HOPELESSLY MAROONED<br>" + points + " POINTS");
 		lander.makeBounce();
 	}
 
 	score+=points;
 
-	// TODO Show score
 	gameState = LANDED;
-	//ARCADE AMENDMENT
 	if(singlePlayMode) {
 		setGameOver();
 	}
-	sendLanded();
 	scheduleRestart();
 }
 
@@ -525,7 +265,6 @@ function setCrashed() {
 	var fuellost = Math.round(((Math.random() * 200) + 200));
 	lander.fuel -= fuellost;
 
-	sendCrashed();
 
 	if(lander.fuel<1) {
 		setGameOver();
@@ -549,8 +288,6 @@ function setCrashed() {
 		if(singlePlayMode) {
 			setGameOver()
 		}
-
-
 	}
 
 	infoDisplay.showGameInfo(msg);
@@ -564,18 +301,11 @@ function setCrashed() {
 function setGameOver() {
 
 		gameState = GAMEOVER;
-		sendGameOver();
 }
 
 function onMouseDown(e) {
 	e.preventDefault();
 	if(gameState==WAITING) newGame();
-}
-
-function onTouchStart(e) {
-	e.preventDefault();
-	if(gameState==WAITING) newGame();
-
 }
 
 function newGame() {
@@ -596,6 +326,7 @@ function scheduleRestart() {
 	setTimeout(restartLevel,4000);
 
 }
+
 function restartLevel() {
 	lander.reset();
 	landscape.setZones();
@@ -606,15 +337,14 @@ function restartLevel() {
 		showStartMessage();
 		lander.vel.x = 2;
 
-		//initGame();
 	} else {
 		gameState = PLAYING;
-		sendRestart();
 		infoDisplay.hideGameInfo();
 	}
 
 
 }
+
 function checkCollisions() {
 
 	var lines = landscape.lines,
@@ -672,7 +402,6 @@ function checkCollisions() {
 
 };
 
-
 function pointIsLessThanLine(point, linepoint1, linepoint2) {
 
 	// so where is the y of the line at the point of the corner?
@@ -682,13 +411,7 @@ function pointIsLessThanLine(point, linepoint1, linepoint2) {
 //	addTestPoint(point.x, yhitpoint);
 	return ((dist > 0) && (dist < 1) && (yhitpoint <= point.y)) ;
 }
-//
-// function addTestPoint(x, y) {
-//
-// 	testPoints.push(new Vector2(x,y));
-// 	if(testPoints.length>2) testPoints.shift();
-//
-// }
+
 function updateTextInfo() {
 
 	infoDisplay.updateBoxInt('score', score, 4);
@@ -802,7 +525,6 @@ function resizeGame (event) {
 	var newHeight = window.innerHeight;
 
 	if((SCREEN_WIDTH== newWidth) && (SCREEN_HEIGHT==newHeight)) return;
-	if(touchable) window.scrollTo(0,-10);
 
 	SCREEN_WIDTH = canvas.width = newWidth;
 	SCREEN_HEIGHT = canvas.height = newHeight;

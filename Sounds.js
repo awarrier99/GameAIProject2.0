@@ -8,10 +8,7 @@ var audioLibParams = {
  };
 
 var samples = jsfxlib.createWaves(audioLibParams);
-  //samples.test.play();
-  //samples.explosion.play();
-//samples.thruster.loop = true;
-//samples.thruster.play();
+
 
 samples.beep.volume = 0.3;
 var thrustSound = samples.thruster;
@@ -20,7 +17,7 @@ var thrustPlaying = false;
 var thrustVolume = 0;
 var thrustTargetVolume = 0 ;
 
-//playThruster();
+
 
 function setThrustVolume(vol) {
 	thrustTargetVolume = vol;
@@ -32,7 +29,6 @@ function setThrustVolume(vol) {
 }
 
 function playThruster() {
-	if(touchable) return;
 	if(thrustInterval) clearInterval(thrustInterval);
 	if(thrustPlaying) {
 		thrustSound.pause();
@@ -46,7 +42,6 @@ function playThruster() {
 }
 
 function updateThruster(e) {
-	if(touchable) return;
 	if(thrustSound.currentTime>8.5) thrustSound.currentTime=0.1;
 	if(thrustVolume!=thrustTargetVolume){
 		thrustVolume+=((thrustTargetVolume-thrustVolume)*0.1);
@@ -59,8 +54,6 @@ function updateThruster(e) {
 
 }
 function stopThruster() {
-	if(touchable) return;
-
 	if(!thrustPlaying) return;
 
 	//thrustSound.currentTime = 2.5;

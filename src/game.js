@@ -144,10 +144,14 @@ function loop() {
 		lander_pad_diff.y = lander.pos.y - (350)
 		// console.log(lander_pad_diff)
 		// console.log(view.x)
-			console.log(lander.pos)
+		// 	console.log(lander.pos)
 	}
 
 	lander.update();
+	var offsetX = landscape.landingPad.x - lander.pos.x;
+	var offsetY = landscape.landingPad.y - lander.bottom;
+	if (offsetY < 0) offsetY = 0;
+	lander.offset = new Vector2(offsetX, offsetY);
 
 	if((gameState == WAITING) && (lander.altitude<100) ) {
 		gameState=GAMEOVER;

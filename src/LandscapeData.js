@@ -28,7 +28,9 @@ Landscape = function(){
 	for(var i = 1; i < points.length; i++){
 		var p1 = points[i-1];
 		var p2 = points[i];
-		lines.push(new LandscapeLine(p1, p2));
+		var line = new LandscapeLine(p1, p2);
+		if (line.landable) this.landingPad = new Vector2((line.p1.x + line.p2.x) / 2, (line.p1.y + line.p2.y) / 2);
+		lines.push(line);
 	}
 
 	// for(var i = 0;i < lines.length;i++)	{
@@ -82,7 +84,6 @@ Landscape = function(){
 		while((line = lines[i]).p1.x+offset<view.right) {
 			var point = line.p2;
 			c.lineTo(point.x+offset, point.y);
-			c.stroke()
 
 			if((counter%20>10) && (line.multiplier!=1)){
 				var infoBox;

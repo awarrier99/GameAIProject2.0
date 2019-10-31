@@ -145,6 +145,7 @@ function InfoDisplay(width, height) {
 		secs = Math.floor(value/1000);
 		mins = Math.floor(secs/60);
 		secs = secs%60;
+		if (secs < 10) secs = '0' + secs;
 		this[boxname].setText(mins+":"+secs);
 
 

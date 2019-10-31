@@ -11,8 +11,9 @@ var SCREEN_WIDTH = window.innerWidth,
 	counter = 0,
 	gameStartTime = Date.now(),
 	skippedFrames,
-	leftKey = KeyTracker.LEFT,
-	rightKey = KeyTracker.RIGHT,
+	upKey = 'W',
+	leftKey = 'A',
+	rightKey = 'D',
 	startKey = ' ',
 	selectKey = '',
 	abortKey = '',
@@ -89,6 +90,10 @@ function init()
 
 	KeyTracker.addKeyDownListener(KeyTracker.UP, function() { if(gameState==PLAYING) lander.thrust(1);});
 	KeyTracker.addKeyUpListener(KeyTracker.UP, function() { lander.thrust(0);});
+	if (upKey) {
+		KeyTracker.addKeyDownListener(upKey.charCodeAt(0), function() { if(gameState==PLAYING) lander.thrust(1);});
+		KeyTracker.addKeyUpListener(upKey.charCodeAt(0), function() { lander.thrust(0);});
+	}
 
 
 	window.addEventListener('resize', resizeGame);

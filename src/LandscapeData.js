@@ -197,7 +197,7 @@ Landscape = function(){
 	};
 
 	function setupData() {
-		points.push(new Vector2(-10, 355.55));
+		points.push(new Vector2(0, 355));
 		points.push(new Vector2(100, 320));
 		points.push(new Vector2(150, 340));
 		points.push(new Vector2(250, 350));

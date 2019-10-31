@@ -140,11 +140,6 @@ function loop() {
 
 	if(gameState == PLAYING) {
 		checkKeys();
-		lander_pad_diff.x = lander.pos.x - (275)
-		lander_pad_diff.y = lander.pos.y - (350)
-		// console.log(lander_pad_diff)
-		// console.log(view.x)
-		// 	console.log(lander.pos)
 	}
 
 	lander.update();
@@ -285,6 +280,12 @@ function setLanded(line) {
 
 function setCrashed() {
 	lander.crash();
+
+	// store x distance to pad
+	// store y velocity
+	// reward = -100
+	// lost fuel during run
+
 
 	// show crashed message
 	// subtract fuel
